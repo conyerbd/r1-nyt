@@ -41,6 +41,11 @@ function App() {
 
   // Scroll wheel and keyboard functionality for Rabbit R1 device
   useEffect(() => {
+    // Only set up listeners after articles have loaded and container exists
+    if (!articlesContainerRef.current || loading) {
+      return;
+    }
+
     const scrollContainer = (direction) => {
       if (articlesContainerRef.current) {
         const container = articlesContainerRef.current;
@@ -80,13 +85,11 @@ function App() {
 
     const articlesContainer = articlesContainerRef.current;
 
-    if (articlesContainer) {
-      articlesContainer.addEventListener('wheel', handleWheel, { passive: false });
-      // Add keydown listener to the container, and make it focusable
-      articlesContainer.setAttribute('tabindex', '0');
-      articlesContainer.addEventListener('keydown', handleKeyDown);
-      articlesContainer.focus();
-    }
+    articlesContainer.addEventListener('wheel', handleWheel, { passive: false });
+    // Add keydown listener to the container, and make it focusable
+    articlesContainer.setAttribute('tabindex', '0');
+    articlesContainer.addEventListener('keydown', handleKeyDown);
+    articlesContainer.focus();
 
     // Cleanup event listeners on component unmount
     return () => {
@@ -95,7 +98,7 @@ function App() {
         articlesContainer.removeEventListener('keydown', handleKeyDown);
       }
     };
-  }, []); // Run this effect only once after the component mounts
+  }, [loading]); // Re-run when loading state changes
 
   if (loading) {
     return (
@@ -130,9 +133,7 @@ function App() {
           {articles.map((article, index) => (
             <article key={index} className="article-card">
               <h2 className="article-title">
-                <a href={article.link} target="_blank" rel="noopener noreferrer">
-                  {article.title}
-                </a>
+                {article.title}
               </h2>
               {article.category && (
                 <span className="article-category">{article.category}</span>
