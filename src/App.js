@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 function App() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const articlesContainerRef = useRef(null);
 
   useEffect(() => {
     const fetchRSSFeed = async () => {
@@ -38,6 +39,64 @@ function App() {
     fetchRSSFeed();
   }, []);
 
+  // Scroll wheel and keyboard functionality for Rabbit R1 device
+  useEffect(() => {
+    const scrollContainer = (direction) => {
+      if (articlesContainerRef.current) {
+        const container = articlesContainerRef.current;
+        const scrollAmount = 60; // Pixels to scroll per step
+        const newScrollTop = container.scrollTop + (direction * scrollAmount);
+        
+        // Smooth scroll to new position
+        container.scrollTo({
+          top: newScrollTop,
+          behavior: 'smooth'
+        });
+      }
+    };
+
+    const handleWheel = (event) => {
+      event.preventDefault();
+      // Determine scroll direction based on wheel delta
+      const scrollDirection = event.deltaY > 0 ? 1 : -1;
+      scrollContainer(scrollDirection);
+    };
+
+    const handleKeyDown = (event) => {
+      // Handle arrow keys for additional navigation support
+      switch (event.key) {
+        case 'ArrowUp':
+          event.preventDefault();
+          scrollContainer(-1);
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          scrollContainer(1);
+          break;
+        default:
+          break;
+      }
+    };
+
+    // Add event listeners to the entire app
+    const appElement = document.querySelector('.App');
+    if (appElement) {
+      appElement.addEventListener('wheel', handleWheel, { passive: false });
+      appElement.addEventListener('keydown', handleKeyDown);
+      // Make the app focusable for keyboard events
+      appElement.setAttribute('tabindex', '0');
+      appElement.focus();
+    }
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      if (appElement) {
+        appElement.removeEventListener('wheel', handleWheel);
+        appElement.removeEventListener('keydown', handleKeyDown);
+      }
+    };
+  }, [loading]); // Re-run when loading state changes
+
   if (loading) {
     return (
       <div className="viewport">
@@ -67,7 +126,7 @@ function App() {
             {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </header>
-        <main className="articles-container">
+        <main className="articles-container" ref={articlesContainerRef}>
           {articles.map((article, index) => (
             <article key={index} className="article-card">
               <h2 className="article-title">

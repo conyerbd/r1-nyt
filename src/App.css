@@ -36,6 +36,7 @@ body {
   color: #121212;
   overflow: hidden;
   border: 1px solid #e2e2e2;
+  outline: none; /* Remove default focus outline for cleaner look */
 }
 
 /* Header with NYT style */
@@ -91,6 +92,7 @@ body {
   height: calc(282px - 42px);
   padding: 6px;
   overflow-y: auto;
+  scroll-behavior: smooth; /* Smooth scrolling for better UX */
 }
 
 /* Article card styling */
