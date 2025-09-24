@@ -2,6 +2,12 @@
 
 A React app for the Rabbit R1 that displays the top stories from The New York Times RSS feed.
 
+## Quick Install on Rabbit R1
+
+![Download QR Code](download.png)
+
+Scan this QR code with your Rabbit R1 to quickly add this NYT RSS Reader app to your device. Simply point your R1's camera at the QR code above and follow the prompts to install the app directly.
+
 ## Features
 
 - Fetches and displays the latest top stories from NYT RSS feed
