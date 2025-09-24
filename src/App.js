@@ -41,11 +41,6 @@ function App() {
 
   // Scroll wheel and keyboard functionality for Rabbit R1 device
   useEffect(() => {
-    // Only set up listeners after articles have loaded and container exists
-    if (!articlesContainerRef.current || loading) {
-      return;
-    }
-
     const scrollContainer = (direction) => {
       if (articlesContainerRef.current) {
         const container = articlesContainerRef.current;
@@ -83,19 +78,21 @@ function App() {
       }
     };
 
-    const articlesContainer = articlesContainerRef.current;
-
-    articlesContainer.addEventListener('wheel', handleWheel, { passive: false });
-    // Add keydown listener to the container, and make it focusable
-    articlesContainer.setAttribute('tabindex', '0');
-    articlesContainer.addEventListener('keydown', handleKeyDown);
-    articlesContainer.focus();
+    // Add event listeners to the entire app
+    const appElement = document.querySelector('.App');
+    if (appElement) {
+      appElement.addEventListener('wheel', handleWheel, { passive: false });
+      appElement.addEventListener('keydown', handleKeyDown);
+      // Make the app focusable for keyboard events
+      appElement.setAttribute('tabindex', '0');
+      appElement.focus();
+    }
 
     // Cleanup event listeners on component unmount
     return () => {
-      if (articlesContainer) {
-        articlesContainer.removeEventListener('wheel', handleWheel);
-        articlesContainer.removeEventListener('keydown', handleKeyDown);
+      if (appElement) {
+        appElement.removeEventListener('wheel', handleWheel);
+        appElement.removeEventListener('keydown', handleKeyDown);
       }
     };
   }, [loading]); // Re-run when loading state changes
@@ -133,7 +130,9 @@ function App() {
           {articles.map((article, index) => (
             <article key={index} className="article-card">
               <h2 className="article-title">
-                {article.title}
+                <a href={article.link} target="_blank" rel="noopener noreferrer">
+                  {article.title}
+                </a>
               </h2>
               {article.category && (
                 <span className="article-category">{article.category}</span>
