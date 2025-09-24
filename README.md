@@ -20,5 +20,5 @@ Scan this QR code with your Rabbit R1 to quickly add this NYT RSS Reader app to 
 2.  Run `npm install` to install dependencies.
 3.  Run `npm start` to start the development server.
 
-This project was based on the R1 TV app by Atomlabor
-![Github](https://github.com/atomlabor/r1-tv?tab=readme-ov-file)
+This project was based on the R1 TV app by Atomlabor. 
+[Github](https://github.com/atomlabor/r1-tv?tab=readme-ov-file)
