@@ -13,7 +13,6 @@ Scan this QR code with your Rabbit R1 to quickly add this NYT RSS Reader app to 
 - Fetches and displays the latest top stories from NYT RSS feed
 - Clean, responsive design optimized for the Rabbit R1
 - Shows article titles, descriptions, categories, and publication dates
-- Click-through links to read full articles on nytimes.com
 
 ## How to Run
 
