@@ -1,6 +1,13 @@
-# R1 NYT
+# R1 NYT RSS Reader
 
-A simple app for the Rabbit R1 that displays the New York Times front page.
+A React app for the Rabbit R1 that displays the top stories from The New York Times RSS feed.
+
+## Features
+
+- Fetches and displays the latest top stories from NYT RSS feed
+- Clean, responsive design optimized for the Rabbit R1
+- Shows article titles, descriptions, categories, and publication dates
+- Click-through links to read full articles on nytimes.com
 
 ## How to Run
 

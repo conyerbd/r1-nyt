@@ -1,9 +1,174 @@
-.App {
-  text-align: center;
+/* NYT Front Page Inspired UI - Optimized for Rabbit R1 240x282 screen */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.nyt-iframe {
-  border: none;
-  width: 100vw;
-  height: 100vh;
+body {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #121212;
+  background: #fdfdfd;
+  overflow: hidden;
+}
+
+/* Total device viewport */
+.viewport {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 282px;
+  background: #fdfdfd;
+  overflow: hidden;
+}
+
+/* App container */
+.App {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 282px;
+  background: #fdfdfd;
+  color: #121212;
+  overflow: hidden;
+  border: 1px solid #e2e2e2;
+}
+
+/* Header with NYT style */
+.app-header {
+  text-align: center;
+  padding: 8px 6px;
+  border-bottom: 2px solid #121212;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  background: #fdfdfd;
+  z-index: 1000;
+}
+
+.app-header h1 {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: bold;
+  color: #121212;
+  margin: 0;
+  line-height: 1;
+}
+
+.last-updated {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 8px;
+  color: #666;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+/* Loading and error states */
+.loading, .error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 12px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.error {
+  color: #d93025;
+}
+
+/* Articles container */
+.articles-container {
+  position: absolute;
+  top: 42px; /* Adjusted for new header height */
+  left: 0;
+  width: 240px;
+  height: calc(282px - 42px);
+  padding: 6px;
+  overflow-y: auto;
+}
+
+/* Article card styling */
+.article-card {
+  border-bottom: 1px solid #e2e2e2;
+  padding: 8px 2px;
+  margin-bottom: 4px;
+}
+
+.article-card:last-child {
+  border-bottom: none;
+}
+
+/* Article title - larger and bolder */
+.article-title {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.article-title a {
+  color: #121212;
+  text-decoration: none;
+}
+
+.article-title a:hover {
+  text-decoration: underline;
+}
+
+/* Article category */
+.article-category {
+  display: inline-block;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #666;
+  padding: 1px 0;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* Article description - more readable */
+.article-description {
+  color: #333;
+  line-height: 1.4;
+  margin: 4px 0;
+  font-size: 11px;
+}
+
+.article-description img {
+  display: none;
+}
+
+/* Article date */
+.article-date {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #888;
+  font-size: 9px;
+  display: block;
+  margin-top: 6px;
+}
+
+/* Custom scrollbar */
+.articles-container::-webkit-scrollbar {
+  width: 4px;
+}
+.articles-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+.articles-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 2px;
+}
+.articles-container::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ccc #f1f1f1;
 }
