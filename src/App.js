@@ -78,24 +78,24 @@ function App() {
       }
     };
 
-    // Add event listeners to the entire app
-    const appElement = document.querySelector('.App');
-    if (appElement) {
-      appElement.addEventListener('wheel', handleWheel, { passive: false });
-      appElement.addEventListener('keydown', handleKeyDown);
-      // Make the app focusable for keyboard events
-      appElement.setAttribute('tabindex', '0');
-      appElement.focus();
+    const articlesContainer = articlesContainerRef.current;
+
+    if (articlesContainer) {
+      articlesContainer.addEventListener('wheel', handleWheel, { passive: false });
+      // Add keydown listener to the container, and make it focusable
+      articlesContainer.setAttribute('tabindex', '0');
+      articlesContainer.addEventListener('keydown', handleKeyDown);
+      articlesContainer.focus();
     }
 
     // Cleanup event listeners on component unmount
     return () => {
-      if (appElement) {
-        appElement.removeEventListener('wheel', handleWheel);
-        appElement.removeEventListener('keydown', handleKeyDown);
+      if (articlesContainer) {
+        articlesContainer.removeEventListener('wheel', handleWheel);
+        articlesContainer.removeEventListener('keydown', handleKeyDown);
       }
     };
-  }, [loading]); // Re-run when loading state changes
+  }, []); // Run this effect only once after the component mounts
 
   if (loading) {
     return (
