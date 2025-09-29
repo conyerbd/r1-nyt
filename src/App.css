@@ -1,4 +1,4 @@
-/* NYT Front Page Inspired UI - Optimized for Rabbit R1 240x282 screen */
+/* Debug Page for Scroll Wheel Testing - Optimized for Rabbit R1 240x282 screen */
 * {
   margin: 0;
   padding: 0;
@@ -6,11 +6,11 @@
 }
 
 body {
-  font-family: Georgia, 'Times New Roman', Times, serif;
-  font-size: 12px;
-  line-height: 1.4;
-  color: #121212;
-  background: #fdfdfd;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  line-height: 1.2;
+  color: #00ff00;
+  background: #000;
   overflow: hidden;
 }
 
@@ -21,9 +21,9 @@ body {
   left: 0;
   width: 240px;
   height: 282px;
-  background: #fdfdfd;
+  background: #000;
   overflow: hidden;
-  outline: none; /* Remove focus outline for cleaner look */
+  outline: none;
 }
 
 /* App container */
@@ -33,147 +33,183 @@ body {
   left: 0;
   width: 240px;
   height: 282px;
-  background: #fdfdfd;
-  color: #121212;
+  background: #000;
+  color: #00ff00;
   overflow: hidden;
-  outline: none; /* Remove default focus outline for cleaner look */
-}
-
-/* Header with NYT style */
-.app-header {
-  text-align: center;
-  padding: 8px 6px;
-  border-bottom: 2px solid #121212;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 240px;
-  background: #fdfdfd;
-  z-index: 1000;
-}
-
-.app-header h1 {
-  font-family: "Georgia", "Times New Roman", serif;
-  font-size: 18px;
-  font-weight: bold;
-  color: #121212;
-  margin: 0;
-  line-height: 1;
-}
-
-.last-updated {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 8px;
-  color: #666;
-  margin-top: 2px;
-  text-transform: uppercase;
-}
-
-/* Loading and error states */
-.loading, .error {
+  outline: none;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  font-size: 12px;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  flex-direction: column;
 }
 
-.error {
-  color: #d93025;
+/* Debug header */
+.debug-header {
+  background: #111;
+  border-bottom: 2px solid #00ff00;
+  padding: 4px 6px;
+  flex-shrink: 0;
 }
 
-/* Articles container */
-.articles-container {
-  position: absolute;
-  top: 42px; /* Adjusted for new header height */
-  left: 0;
-  width: 240px;
-  height: calc(282px - 42px);
-  padding: 6px;
+.debug-header h1 {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.debug-info {
+  font-size: 9px;
+  color: #0f0;
+}
+
+/* Debug controls */
+.debug-controls {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: #111;
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.debug-controls button {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  padding: 3px 4px;
+  background: #222;
+  color: #0f0;
+  border: 1px solid #0f0;
+  cursor: pointer;
+  flex: 1;
+  min-width: 28px;
+}
+
+.debug-controls button:hover {
+  background: #333;
+}
+
+.debug-controls button.active {
+  background: #0f0;
+  color: #000;
+  font-weight: bold;
+}
+
+/* Scroll test area */
+.scroll-test-area {
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-behavior: smooth; /* Smooth scrolling for better UX */
-  overscroll-behavior: contain; /* Prevent scroll chaining on R1 device */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+  background: #001100;
+  padding: 4px;
+  border: 1px solid #0f0;
+  margin: 4px;
+  max-height: 80px;
+  scroll-behavior: smooth;
 }
 
-/* Article card styling */
-.article-card {
-  border-bottom: 1px solid #e2e2e2;
-  padding: 8px 2px;
+.test-content h3 {
+  font-size: 11px;
   margin-bottom: 4px;
+  color: #0ff;
 }
 
-.article-card:last-child {
+.test-content p {
+  font-size: 9px;
+  margin-bottom: 4px;
+  color: #ff0;
+}
+
+.test-item {
+  padding: 3px;
+  margin: 2px 0;
+  background: #002200;
+  border-left: 2px solid #0f0;
+  font-size: 9px;
+}
+
+/* Log container */
+.log-container {
+  flex: 1;
+  background: #000;
+  border: 1px solid #0f0;
+  margin: 4px;
+  padding: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-header {
+  font-size: 10px;
+  font-weight: bold;
+  color: #ff0;
+  margin-bottom: 2px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+}
+
+.log-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-size: 8px;
+  line-height: 1.3;
+}
+
+.log-empty {
+  color: #666;
+  font-style: italic;
+}
+
+.log-entry {
+  padding: 1px 0;
+  border-bottom: 1px solid #111;
+}
+
+.log-entry:last-child {
   border-bottom: none;
 }
 
-/* Article title - larger and bolder */
-.article-title {
-  margin: 0 0 4px 0;
-  font-size: 14px;
-  line-height: 1.2;
-  font-weight: 700;
-}
-
-.article-title a {
-  color: #121212;
-  text-decoration: none;
-}
-
-.article-title a:hover {
-  text-decoration: underline;
-}
-
-/* Article category */
-.article-category {
-  display: inline-block;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  color: #666;
-  padding: 1px 0;
-  font-size: 9px;
-  font-weight: 600;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-/* Article description - more readable */
-.article-description {
-  color: #333;
-  line-height: 1.4;
-  margin: 4px 0;
-  font-size: 11px;
-}
-
-.article-description img {
-  display: none;
-}
-
-/* Article date */
-.article-date {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+/* Method legend */
+.method-legend {
+  background: #111;
+  border-top: 1px solid #333;
+  padding: 3px 4px;
+  font-size: 7px;
   color: #888;
-  font-size: 9px;
-  display: block;
-  margin-top: 6px;
+  flex-shrink: 0;
+  line-height: 1.4;
 }
 
-/* Custom scrollbar */
-.articles-container::-webkit-scrollbar {
-  width: 4px;
+.method-legend div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.articles-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
+
+/* Custom scrollbar for log and test area */
+.log-content::-webkit-scrollbar,
+.scroll-test-area::-webkit-scrollbar {
+  width: 3px;
 }
-.articles-container::-webkit-scrollbar-thumb {
-  background: #ccc;
+
+.log-content::-webkit-scrollbar-track,
+.scroll-test-area::-webkit-scrollbar-track {
+  background: #111;
+}
+
+.log-content::-webkit-scrollbar-thumb,
+.scroll-test-area::-webkit-scrollbar-thumb {
+  background: #0f0;
   border-radius: 2px;
 }
-.articles-container::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
+
+.log-content::-webkit-scrollbar-thumb:hover,
+.scroll-test-area::-webkit-scrollbar-thumb:hover {
+  background: #0ff;
 }
+
 * {
   scrollbar-width: thin;
-  scrollbar-color: #ccc #f1f1f1;
+  scrollbar-color: #0f0 #111;
 }
