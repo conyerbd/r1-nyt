@@ -114,10 +114,31 @@ function App() {
         
         addLog(`EVENT: ${details}`);
         
-        // Try to scroll
+        // Handle scrolling based on event type
         if (scrollTestRef.current) {
-          const scrollDir = e.deltaY > 0 || e.detail > 0 || e.wheelDelta < 0 ? 1 : -1;
-          scrollTestRef.current.scrollTop += scrollDir * 30;
+          let scrollAmount = 0;
+          
+          // R1 custom events: "scroll" = DOWN, "scrollUp" = UP
+          if (e.type === 'scrollUp') {
+            scrollAmount = -40; // Scroll UP (negative)
+            addLog('→ Scrolling UP');
+          } else if (e.type === 'scroll' && e.target === window) {
+            // Only handle window-level "scroll" events from R1, not container scroll events
+            scrollAmount = 40; // Scroll DOWN (positive)
+            addLog('→ Scrolling DOWN');
+          }
+          // Standard wheel events (for web testing)
+          else if (e.deltaY !== undefined && e.type === 'wheel') {
+            scrollAmount = e.deltaY > 0 ? 40 : -40;
+          } else if (e.wheelDelta !== undefined) {
+            scrollAmount = e.wheelDelta < 0 ? 40 : -40;
+          } else if (e.detail !== undefined && e.type === 'DOMMouseScroll') {
+            scrollAmount = e.detail > 0 ? 40 : -40;
+          }
+          
+          if (scrollAmount !== 0) {
+            scrollTestRef.current.scrollTop += scrollAmount;
+          }
         }
       };
 
