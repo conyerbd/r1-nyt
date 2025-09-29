@@ -181,6 +181,34 @@ function App() {
     return () => container.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Test Method 7: R1 Custom Events (scrollUp/scrollDown)
+  useEffect(() => {
+    if (testMethod !== 'method7' && testMethod !== 'all') return;
+
+    const handleScrollUp = () => {
+      addLog('M7 R1 scrollUp event!');
+      if (scrollTestRef.current) {
+        scrollTestRef.current.scrollTop -= 30;
+      }
+    };
+
+    const handleScrollDown = () => {
+      addLog('M7 R1 scrollDown event!');
+      if (scrollTestRef.current) {
+        scrollTestRef.current.scrollTop += 30;
+      }
+    };
+
+    window.addEventListener('scrollUp', handleScrollUp);
+    window.addEventListener('scrollDown', handleScrollDown);
+    addLog('Method 7 activated: R1 custom scrollUp/scrollDown events');
+
+    return () => {
+      window.removeEventListener('scrollUp', handleScrollUp);
+      window.removeEventListener('scrollDown', handleScrollDown);
+    };
+  }, [testMethod]);
+
   // Touch events for debugging
   useEffect(() => {
     const handleTouch = (e) => {
@@ -251,6 +279,12 @@ function App() {
           >
             M6
           </button>
+          <button 
+            className={testMethod === 'method7' ? 'active' : ''}
+            onClick={() => { setTestMethod('method7'); addLog('Testing method 7'); }}
+          >
+            M7
+          </button>
           <button onClick={() => { setLogs([]); addLog('Logs cleared'); }}>
             Clear
           </button>
@@ -288,6 +322,7 @@ function App() {
           <div>M4: mousewheel</div>
           <div>M5: DOMMouseScroll</div>
           <div>M6: container wheel</div>
+          <div className="highlight">M7: R1 custom scrollUp/Down ⭐</div>
         </div>
       </div>
     </div>

@@ -187,6 +187,11 @@ body {
   text-overflow: ellipsis;
 }
 
+.method-legend div.highlight {
+  color: #ff0;
+  font-weight: bold;
+}
+
 /* Custom scrollbar for log and test area */
 .log-content::-webkit-scrollbar,
 .scroll-test-area::-webkit-scrollbar {
