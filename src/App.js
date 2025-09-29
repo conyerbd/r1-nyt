@@ -55,16 +55,24 @@ function App() {
       }
     };
 
+    // Handle wheel events - listen at document level for R1 device compatibility
     const handleWheel = (event) => {
+      // Only handle if articles are loaded
+      if (!articlesContainerRef.current) return;
+      
       event.preventDefault();
       event.stopPropagation();
+      
       // Determine scroll direction based on wheel delta
       const scrollDirection = event.deltaY > 0 ? 1 : -1;
       scrollContainer(scrollDirection);
     };
 
+    // Handle arrow keys for additional navigation support
     const handleKeyDown = (event) => {
-      // Handle arrow keys for additional navigation support
+      // Only handle if articles are loaded
+      if (!articlesContainerRef.current) return;
+      
       switch (event.key) {
         case 'ArrowUp':
           event.preventDefault();
@@ -79,32 +87,14 @@ function App() {
       }
     };
 
-    // Add event listeners to both the viewport and the articles container
-    const viewportElement = document.querySelector('.viewport');
-    const articlesContainer = articlesContainerRef.current;
-    
-    if (viewportElement) {
-      viewportElement.addEventListener('wheel', handleWheel, { passive: false });
-      viewportElement.addEventListener('keydown', handleKeyDown);
-      // Make the viewport focusable for keyboard events
-      viewportElement.setAttribute('tabindex', '0');
-      viewportElement.focus();
-    }
-
-    // Also add wheel listener directly to articles container for better reliability
-    if (articlesContainer) {
-      articlesContainer.addEventListener('wheel', handleWheel, { passive: false });
-    }
+    // Add event listeners at document level (R1 device sends events here)
+    document.addEventListener('wheel', handleWheel, { passive: false });
+    document.addEventListener('keydown', handleKeyDown);
 
     // Cleanup event listeners on component unmount
     return () => {
-      if (viewportElement) {
-        viewportElement.removeEventListener('wheel', handleWheel);
-        viewportElement.removeEventListener('keydown', handleKeyDown);
-      }
-      if (articlesContainer) {
-        articlesContainer.removeEventListener('wheel', handleWheel);
-      }
+      document.removeEventListener('wheel', handleWheel);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [articles]); // Re-run when articles are loaded
 
