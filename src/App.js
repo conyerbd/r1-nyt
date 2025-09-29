@@ -57,6 +57,7 @@ function App() {
 
     const handleWheel = (event) => {
       event.preventDefault();
+      event.stopPropagation();
       // Determine scroll direction based on wheel delta
       const scrollDirection = event.deltaY > 0 ? 1 : -1;
       scrollContainer(scrollDirection);
@@ -78,24 +79,34 @@ function App() {
       }
     };
 
-    // Add event listeners to the entire app
-    const appElement = document.querySelector('.App');
-    if (appElement) {
-      appElement.addEventListener('wheel', handleWheel, { passive: false });
-      appElement.addEventListener('keydown', handleKeyDown);
-      // Make the app focusable for keyboard events
-      appElement.setAttribute('tabindex', '0');
-      appElement.focus();
+    // Add event listeners to both the viewport and the articles container
+    const viewportElement = document.querySelector('.viewport');
+    const articlesContainer = articlesContainerRef.current;
+    
+    if (viewportElement) {
+      viewportElement.addEventListener('wheel', handleWheel, { passive: false });
+      viewportElement.addEventListener('keydown', handleKeyDown);
+      // Make the viewport focusable for keyboard events
+      viewportElement.setAttribute('tabindex', '0');
+      viewportElement.focus();
+    }
+
+    // Also add wheel listener directly to articles container for better reliability
+    if (articlesContainer) {
+      articlesContainer.addEventListener('wheel', handleWheel, { passive: false });
     }
 
     // Cleanup event listeners on component unmount
     return () => {
-      if (appElement) {
-        appElement.removeEventListener('wheel', handleWheel);
-        appElement.removeEventListener('keydown', handleKeyDown);
+      if (viewportElement) {
+        viewportElement.removeEventListener('wheel', handleWheel);
+        viewportElement.removeEventListener('keydown', handleKeyDown);
+      }
+      if (articlesContainer) {
+        articlesContainer.removeEventListener('wheel', handleWheel);
       }
     };
-  }, [loading]); // Re-run when loading state changes
+  }, [articles]); // Re-run when articles are loaded
 
   if (loading) {
     return (
