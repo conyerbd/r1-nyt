@@ -2,266 +2,154 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 function App() {
-  const [logs, setLogs] = useState([]);
-  const [deviceInfo, setDeviceInfo] = useState({});
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const logContainerRef = useRef(null);
-  const scrollTestRef = useRef(null);
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const articlesContainerRef = useRef(null);
 
-  const addLog = (message) => {
-    const timestamp = new Date().toLocaleTimeString('en-US', { 
-      hour12: false, 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      second: '2-digit',
-      fractionalSecondDigits: 3
-    });
-    setLogs(prev => [...prev, `${timestamp}: ${message}`].slice(-100)); // Keep last 100 logs
-  };
-
-  // Comprehensive device detection on mount
   useEffect(() => {
-    addLog('=== DEVICE DETECTION START ===');
-    
-    const info = {
-      userAgent: navigator.userAgent,
-      platform: navigator.platform,
-      screenWidth: window.screen.width,
-      screenHeight: window.screen.height,
-      innerWidth: window.innerWidth,
-      innerHeight: window.innerHeight,
-    };
-
-    // Check for R1-specific APIs
-    const r1Objects = [
-      'PluginMessageHandler',
-      'closeWebView',
-      'TouchEventHandler',
-      'creationStorage',
-      'creationSensors',
-      'rabbitOS',
-      'r1Device',
-      'r1SDK',
-      'rabbitSDK',
-      'android',
-      'webkit'
-    ];
-
-    r1Objects.forEach(obj => {
-      if (window[obj]) {
-        info[obj] = 'EXISTS';
-        addLog(`✓ Found: window.${obj}`);
-        // Log methods if it's an object
-        if (typeof window[obj] === 'object') {
-          const methods = Object.keys(window[obj]);
-          addLog(`  Methods: ${methods.join(', ')}`);
-        }
+    const fetchRSSFeed = async () => {
+      try {
+        // Using a CORS proxy to fetch the RSS feed
+        const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml'));
+        const data = await response.json();
+        
+        // Parse the XML
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
+        const items = xmlDoc.querySelectorAll('item');
+        
+        const parsedArticles = Array.from(items).slice(0, 15).map(item => ({
+          title: item.querySelector('title')?.textContent || '',
+          link: item.querySelector('link')?.textContent || '',
+          description: item.querySelector('description')?.textContent || '',
+          pubDate: item.querySelector('pubDate')?.textContent || '',
+          category: item.querySelector('category')?.textContent || ''
+        }));
+        
+        setArticles(parsedArticles);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch RSS feed');
+        setLoading(false);
+        console.error('Error fetching RSS:', err);
       }
-    });
+    };
 
-    // Check for special properties
-    if (window.rabbitOS || window.r1Device || window.r1SDK) {
-      addLog('R1 DEVICE DETECTED!');
-    } else {
-      addLog('No R1-specific objects found');
-    }
-
-    setDeviceInfo(info);
-    addLog('=== DEVICE DETECTION END ===');
-    addLog('');
-    addLog('Now try scrolling...');
+    fetchRSSFeed();
   }, []);
 
-  // Listen for EVERY possible event type
+  // Scroll wheel and keyboard functionality for Rabbit R1 device
   useEffect(() => {
-    const allEventTypes = [
-      // Standard wheel events
-      'wheel', 'mousewheel', 'DOMMouseScroll',
-      // R1 custom events - THE ACTUAL ONES
-      'scrollUp', 'scrollDown',
-      // Touch events
-      'touchstart', 'touchmove', 'touchend', 'touchcancel',
-      // Pointer events
-      'pointerdown', 'pointermove', 'pointerup', 'pointercancel',
-      // Mouse events
-      'mousedown', 'mousemove', 'mouseup',
-      // Key events
-      'keydown', 'keyup', 'keypress',
-      // Gesture events (WebKit)
-      'gesturestart', 'gesturechange', 'gestureend',
-      // Custom potential R1 events
-      'r1scroll', 'r1wheel', 'r1input', 'rabbitscroll',
-      'scrollwheel', 'scroll-wheel', 'wheelscroll',
-      // Side button events (from polyfills)
-      'sideClick', 'longPressStart', 'longPressEnd'
-    ];
+    const scrollContainer = (amount) => {
+      if (articlesContainerRef.current) {
+        const container = articlesContainerRef.current;
+        container.scrollBy({
+          top: amount,
+          behavior: 'smooth'
+        });
+      }
+    };
 
-    const handlers = {};
+    // R1 scroll wheel events: directions are flipped!
+    // "scrollUp" = wheel turns up = moves content DOWN (increase scrollTop)
+    // "scrollDown" = wheel turns down = moves content UP (decrease scrollTop)
+    const handleScrollDown = (event) => {
+      event.preventDefault();
+      scrollContainer(-40); // scrollDown event = moves content UP
+    };
 
-    allEventTypes.forEach(eventType => {
-      const handler = (e) => {
-        let details = `type=${e.type}`;
-        
-        // Add target information
-        let targetInfo = 'unknown';
-        if (e.target === window) targetInfo = 'window';
-        else if (e.target === document) targetInfo = 'document';
-        else if (e.target === scrollTestRef.current) targetInfo = 'container';
-        else if (e.target?.nodeName) targetInfo = e.target.nodeName;
-        details += `, target=${targetInfo}`;
-        
-        // Add relevant details based on event type
-        if (e.deltaY !== undefined) details += `, deltaY=${e.deltaY}`;
-        if (e.deltaX !== undefined) details += `, deltaX=${e.deltaX}`;
-        if (e.wheelDelta !== undefined) details += `, wheelDelta=${e.wheelDelta}`;
-        if (e.detail !== undefined) details += `, detail=${e.detail}`;
-        if (e.key) details += `, key=${e.key}`;
-        if (e.touches) details += `, touches=${e.touches.length}`;
-        
-        // Only log non-container scroll events to reduce noise
-        if (e.type !== 'scroll' || e.target !== scrollTestRef.current) {
-          addLog(`EVENT: ${details}`);
-        }
-        
-        // Handle scrolling based on event type
-        if (scrollTestRef.current) {
-          let scrollAmount = 0;
-          
-          // R1 custom events: directions are flipped!
-          // "scrollUp" = wheel turns up = moves content DOWN (increase scrollTop)
-          // "scrollDown" = wheel turns down = moves content UP (decrease scrollTop)
-          if (e.type === 'scrollDown') {
-            scrollAmount = -40; // scrollDown event = moves content UP
-            addLog(`→ SCROLLDOWN: applying -40`);
-          } else if (e.type === 'scrollUp') {
-            scrollAmount = 40; // scrollUp event = moves content DOWN
-            addLog(`→ SCROLLUP: applying +40`);
-          }
-          // Standard wheel events (for web testing)
-          else if (e.deltaY !== undefined && e.type === 'wheel') {
-            scrollAmount = e.deltaY > 0 ? 40 : -40;
-          } else if (e.wheelDelta !== undefined) {
-            scrollAmount = e.wheelDelta < 0 ? 40 : -40;
-          } else if (e.detail !== undefined && e.type === 'DOMMouseScroll') {
-            scrollAmount = e.detail > 0 ? 40 : -40;
-          }
-          
-          if (scrollAmount !== 0) {
-            const oldScroll = scrollTestRef.current.scrollTop;
-            scrollTestRef.current.scrollTop += scrollAmount;
-            const newScroll = scrollTestRef.current.scrollTop;
-            addLog(`  Applied: ${oldScroll} → ${newScroll}`);
-          }
-        }
-      };
+    const handleScrollUp = (event) => {
+      event.preventDefault();
+      scrollContainer(40); // scrollUp event = moves content DOWN
+    };
 
-      handlers[eventType] = handler;
+    const handleKeyDown = (event) => {
+      // Handle arrow keys for additional navigation support
+      switch (event.key) {
+        case 'ArrowUp':
+          event.preventDefault();
+          scrollContainer(-40);
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          scrollContainer(40);
+          break;
+        default:
+          break;
+      }
+    };
 
-      // Add listeners at different levels
-      window.addEventListener(eventType, handler, { passive: false, capture: true });
-      document.addEventListener(eventType, handler, { passive: false, capture: true });
-    });
+    // Add R1 scroll wheel event listeners
+    window.addEventListener('scrollDown', handleScrollDown, { passive: false, capture: true });
+    window.addEventListener('scrollUp', handleScrollUp, { passive: false, capture: true });
+    document.addEventListener('scrollDown', handleScrollDown, { passive: false, capture: true });
+    document.addEventListener('scrollUp', handleScrollUp, { passive: false, capture: true });
+    
+    // Add keyboard listener
+    document.addEventListener('keydown', handleKeyDown);
 
-    addLog(`Listening for ${allEventTypes.length} event types...`);
-
+    // Cleanup event listeners on component unmount
     return () => {
-      allEventTypes.forEach(eventType => {
-        window.removeEventListener(eventType, handlers[eventType], { capture: true });
-        document.removeEventListener(eventType, handlers[eventType], { capture: true });
-      });
+      window.removeEventListener('scrollDown', handleScrollDown, { capture: true });
+      window.removeEventListener('scrollUp', handleScrollUp, { capture: true });
+      document.removeEventListener('scrollDown', handleScrollDown, { capture: true });
+      document.removeEventListener('scrollUp', handleScrollUp, { capture: true });
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [articles]); // Re-run when articles are loaded
 
-  // Monitor scroll position
-  useEffect(() => {
-    const container = scrollTestRef.current;
-    if (!container) return;
+  if (loading) {
+    return (
+      <div className="viewport">
+        <div className="App">
+          <div className="loading">loading nyt stories...</div>
+        </div>
+      </div>
+    );
+  }
 
-    const handleScroll = () => {
-      setScrollPosition(container.scrollTop);
-      addLog(`Scroll position: ${container.scrollTop}px`);
-    };
-
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Check if messages are being sent via postMessage or other mechanisms
-  useEffect(() => {
-    const handleMessage = (e) => {
-      addLog(`MESSAGE received: ${JSON.stringify(e.data)}`);
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  if (error) {
+    return (
+      <div className="viewport">
+        <div className="App">
+          <div className="error">{error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="viewport">
       <div className="App">
-        <header className="debug-header">
-          <h1>R1 Scroll Debug <span className="version">v2.8</span></h1>
-          <div className="debug-info">
-            Scroll: {scrollPosition}px | Events: {logs.length}
-          </div>
+        <header className="app-header">
+          <h1>The New York Times</h1>
+          <p className="last-updated">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
         </header>
-
-        <div className="device-info">
-          <div className="info-title">Device Info:</div>
-          <div className="info-content">
-            {deviceInfo.userAgent && (
-              <div className="info-item">UA: {deviceInfo.userAgent.substring(0, 30)}...</div>
-            )}
-            <div className="info-item">
-              Screen: {deviceInfo.screenWidth}x{deviceInfo.screenHeight}
-            </div>
-            <div className="info-item">
-              Viewport: {deviceInfo.innerWidth}x{deviceInfo.innerHeight}
-            </div>
-            {Object.keys(deviceInfo).filter(k => !['userAgent', 'platform', 'screenWidth', 'screenHeight', 'innerWidth', 'innerHeight'].includes(k)).map(key => (
-              <div key={key} className="info-item r1-api">
-                {key}: {deviceInfo[key]}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="scroll-test-area" ref={scrollTestRef}>
-          <div className="test-content">
-            <h3>Scrollable Test Area</h3>
-            <p>Try using the scroll wheel now...</p>
-            <p>Any detected events will appear in the log below.</p>
-            {[...Array(50)].map((_, i) => (
-              <div key={i} className="test-item">
-                Line {i + 1} - Test scrolling content
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="log-container" ref={logContainerRef}>
-          <div className="log-header">
-            Event Log: ({logs.length} events)
-            <button className="clear-btn" onClick={() => setLogs([])}>Clear</button>
-          </div>
-          <div className="log-content">
-            {logs.length === 0 ? (
-              <div className="log-empty">Waiting for events...</div>
-            ) : (
-              logs.map((log, i) => (
-                <div key={i} className={`log-entry ${log.includes('EVENT:') ? 'log-event' : ''}`}>
-                  {log}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="instructions">
-          <div>🔍 Listening for ALL event types</div>
-          <div>🎯 Try: scroll wheel, touch, keys, clicks</div>
-          <div>📝 All events will be logged above</div>
-        </div>
+        <main className="articles-container" ref={articlesContainerRef}>
+          {articles.map((article, index) => (
+            <article key={index} className="article-card">
+              <h2 className="article-title">
+                <a href={article.link} target="_blank" rel="noopener noreferrer">
+                  {article.title}
+                </a>
+              </h2>
+              {article.category && (
+                <span className="article-category">{article.category}</span>
+              )}
+              <p className="article-description" 
+                 dangerouslySetInnerHTML={{ __html: article.description }} />
+              <time className="article-date">
+                {new Date(article.pubDate).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </time>
+            </article>
+          ))}
+        </main>
       </div>
     </div>
   );
