@@ -104,6 +104,14 @@ function App() {
       const handler = (e) => {
         let details = `type=${e.type}`;
         
+        // Add target information
+        let targetInfo = 'unknown';
+        if (e.target === window) targetInfo = 'window';
+        else if (e.target === document) targetInfo = 'document';
+        else if (e.target === scrollTestRef.current) targetInfo = 'container';
+        else if (e.target?.nodeName) targetInfo = e.target.nodeName;
+        details += `, target=${targetInfo}`;
+        
         // Add relevant details based on event type
         if (e.deltaY !== undefined) details += `, deltaY=${e.deltaY}`;
         if (e.deltaX !== undefined) details += `, deltaX=${e.deltaX}`;
@@ -118,18 +126,19 @@ function App() {
         if (scrollTestRef.current) {
           let scrollAmount = 0;
           
-          // R1 custom events: "scroll" = DOWN, "scrollUp" = UP
+          // R1 custom events: "scroll" = DOWN wheel motion, "scrollUp" = UP wheel motion
           if (e.type === 'scrollUp') {
-            scrollAmount = -40; // ScrollUp = move content UP (decrease scrollTop)
-            addLog(`→ scrollUp: -40 (target: ${e.target.nodeName || e.target})`);
+            scrollAmount = 40; // Wheel up = scroll content down (increase scrollTop to see content below)
+            addLog(`→ SCROLLUP: will apply +40`);
           } else if (e.type === 'scroll') {
             // Check if this is from the R1 wheel (not from our container scrolling)
             const isFromContainer = e.target === scrollTestRef.current;
+            addLog(`→ SCROLL: isFromContainer=${isFromContainer}`);
             if (!isFromContainer) {
-              scrollAmount = 40; // scroll = move content DOWN (increase scrollTop)
-              addLog(`→ scroll: +40 (target: ${e.target.nodeName || e.target})`);
+              scrollAmount = -40; // Wheel down = scroll content up (decrease scrollTop to see content above)
+              addLog(`→ SCROLL: will apply -40`);
             } else {
-              addLog(`→ scroll: ignored (from container)`);
+              addLog(`→ SCROLL: ignored (container feedback)`);
             }
           }
           // Standard wheel events (for web testing)
@@ -195,7 +204,7 @@ function App() {
     <div className="viewport">
       <div className="App">
         <header className="debug-header">
-          <h1>R1 Scroll Debug <span className="version">v2.3</span></h1>
+          <h1>R1 Scroll Debug <span className="version">v2.5</span></h1>
           <div className="debug-info">
             Scroll: {scrollPosition}px | Events: {logs.length}
           </div>
