@@ -78,7 +78,7 @@ function App() {
       // Standard wheel events
       'wheel', 'mousewheel', 'DOMMouseScroll',
       // R1 custom events (from polyfills)
-      'scrollUp', 'scrollDown',
+      'scroll', 'scrollDown',
       // Touch events
       'touchstart', 'touchmove', 'touchend', 'touchcancel',
       // Pointer events
@@ -126,17 +126,17 @@ function App() {
         if (scrollTestRef.current) {
           let scrollAmount = 0;
           
-          // R1 custom events: "scroll" = DOWN wheel motion, "scrollUp" = UP wheel motion
-          if (e.type === 'scrollUp') {
-            scrollAmount = 40; // Wheel up = scroll content down (increase scrollTop to see content below)
-            addLog(`→ SCROLLUP: will apply +40`);
+          // R1 custom events: "scroll" = wheel DOWN, "scrollDown" = wheel UP (yes, it's backwards!)
+          if (e.type === 'scrollDown') {
+            scrollAmount = -40; // scrollDown event = moves content UP
+            addLog(`→ SCROLLDOWN: will apply -40`);
           } else if (e.type === 'scroll') {
             // Check if this is from the R1 wheel (not from our container scrolling)
             const isFromContainer = e.target === scrollTestRef.current;
             addLog(`→ SCROLL: isFromContainer=${isFromContainer}`);
             if (!isFromContainer) {
-              scrollAmount = -40; // Wheel down = scroll content up (decrease scrollTop to see content above)
-              addLog(`→ SCROLL: will apply -40`);
+              scrollAmount = 40; // scroll event = moves content DOWN
+              addLog(`→ SCROLL: will apply +40`);
             } else {
               addLog(`→ SCROLL: ignored (container feedback)`);
             }
@@ -204,7 +204,7 @@ function App() {
     <div className="viewport">
       <div className="App">
         <header className="debug-header">
-          <h1>R1 Scroll Debug <span className="version">v2.5</span></h1>
+          <h1>R1 Scroll Debug <span className="version">v2.6</span></h1>
           <div className="debug-info">
             Scroll: {scrollPosition}px | Events: {logs.length}
           </div>
