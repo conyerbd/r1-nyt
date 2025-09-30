@@ -200,6 +200,7 @@ function App() {
   return (
     <div className="viewport">
       <div className="App">
+        <div className="version">v1.0</div>
         <header className="app-header">
           <h1>The New York Times</h1>
           <p className="last-updated">

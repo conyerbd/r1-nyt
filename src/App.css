@@ -39,6 +39,18 @@ body {
   outline: none; /* Remove default focus outline for cleaner look */
 }
 
+/* Version number */
+.version {
+  position: fixed;
+  top: 2px;
+  left: 2px;
+  font-size: 7px;
+  color: #999;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  z-index: 9999;
+  opacity: 0.6;
+}
+
 /* Header with NYT style */
 .app-header {
   text-align: center;
