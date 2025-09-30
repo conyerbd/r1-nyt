@@ -77,7 +77,7 @@ function App() {
     const allEventTypes = [
       // Standard wheel events
       'wheel', 'mousewheel', 'DOMMouseScroll',
-      // R1 custom events (from polyfills)
+      // R1 custom events - THE ACTUAL ONES
       'scroll', 'scrollDown',
       // Touch events
       'touchstart', 'touchmove', 'touchend', 'touchcancel',
@@ -89,8 +89,6 @@ function App() {
       'keydown', 'keyup', 'keypress',
       // Gesture events (WebKit)
       'gesturestart', 'gesturechange', 'gestureend',
-      // Scroll event
-      'scroll',
       // Custom potential R1 events
       'r1scroll', 'r1wheel', 'r1input', 'rabbitscroll',
       'scrollwheel', 'scroll-wheel', 'wheelscroll',
@@ -129,11 +127,15 @@ function App() {
           // R1 custom events: "scroll" = wheel DOWN, "scrollDown" = wheel UP (yes, it's backwards!)
           if (e.type === 'scrollDown') {
             scrollAmount = -40; // scrollDown event = moves content UP
-            addLog(`→ SCROLLDOWN: will apply -40`);
+            addLog(`→ SCROLLDOWN EVENT DETECTED: will apply -40`);
           } else if (e.type === 'scroll') {
             // Check if this is from the R1 wheel (not from our container scrolling)
             const isFromContainer = e.target === scrollTestRef.current;
-            addLog(`→ SCROLL: isFromContainer=${isFromContainer}`);
+            const targetName = e.target === window ? 'window' : 
+                              e.target === document ? 'document' : 
+                              e.target === scrollTestRef.current ? 'container' : 
+                              (e.target?.nodeName || 'unknown');
+            addLog(`→ SCROLL EVENT: target=${targetName}, isFromContainer=${isFromContainer}`);
             if (!isFromContainer) {
               scrollAmount = 40; // scroll event = moves content DOWN
               addLog(`→ SCROLL: will apply +40`);
@@ -204,7 +206,7 @@ function App() {
     <div className="viewport">
       <div className="App">
         <header className="debug-header">
-          <h1>R1 Scroll Debug <span className="version">v2.6</span></h1>
+          <h1>R1 Scroll Debug <span className="version">v2.7</span></h1>
           <div className="debug-info">
             Scroll: {scrollPosition}px | Events: {logs.length}
           </div>
