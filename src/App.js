@@ -77,8 +77,8 @@ function App() {
     const allEventTypes = [
       // Standard wheel events
       'wheel', 'mousewheel', 'DOMMouseScroll',
-      // R1 custom events - THE ACTUAL ONES
-      'scroll', 'scrollDown',
+      // R1 custom events (from polyfills)
+      'scrollUp', 'scrollDown',
       // Touch events
       'touchstart', 'touchmove', 'touchend', 'touchcancel',
       // Pointer events
@@ -89,6 +89,8 @@ function App() {
       'keydown', 'keyup', 'keypress',
       // Gesture events (WebKit)
       'gesturestart', 'gesturechange', 'gestureend',
+      // Scroll event
+      'scroll',
       // Custom potential R1 events
       'r1scroll', 'r1wheel', 'r1input', 'rabbitscroll',
       'scrollwheel', 'scroll-wheel', 'wheelscroll',
@@ -110,10 +112,7 @@ function App() {
         if (e.key) details += `, key=${e.key}`;
         if (e.touches) details += `, touches=${e.touches.length}`;
         
-        // Only log non-container scroll events to reduce noise
-        if (e.type !== 'scroll' || e.target !== scrollTestRef.current) {
-          addLog(`EVENT: ${details}`);
-        }
+        addLog(`EVENT: ${details}`);
         
         // Handle scrolling based on event type
         if (scrollTestRef.current) {
@@ -132,8 +131,6 @@ function App() {
             } else {
               addLog(`→ scroll: ignored (from container)`);
             }
-            }
-            // Don't log ignored container scrolls - too much noise
           }
           // Standard wheel events (for web testing)
           else if (e.deltaY !== undefined && e.type === 'wheel') {
@@ -198,7 +195,7 @@ function App() {
     <div className="viewport">
       <div className="App">
         <header className="debug-header">
-          <h1>R1 Scroll Debug <span className="version">v2.8</span></h1>
+          <h1>R1 Scroll Debug <span className="version">v2.3</span></h1>
           <div className="debug-info">
             Scroll: {scrollPosition}px | Events: {logs.length}
           </div>
