@@ -1,4 +1,4 @@
-/* Comprehensive Debug Page - Optimized for Rabbit R1 240x282 screen */
+/* Comprehensive Debug Page - Optimized for Rabbit R1 240x320 screen */
 * {
   margin: 0;
   padding: 0;
@@ -20,7 +20,7 @@ body {
   top: 0;
   left: 0;
   width: 240px;
-  height: 282px;
+  height: 362px;
   background: #000;
   overflow: hidden;
   outline: none;
@@ -32,7 +32,7 @@ body {
   top: 0;
   left: 0;
   width: 240px;
-  height: 282px;
+  height: 362px;
   background: #000;
   color: #00ff00;
   overflow: hidden;

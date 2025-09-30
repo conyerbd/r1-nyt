@@ -77,7 +77,7 @@ function App() {
     const allEventTypes = [
       // Standard wheel events
       'wheel', 'mousewheel', 'DOMMouseScroll',
-      // R1 custom events (from polyfills)
+      // R1 custom events - THE ACTUAL ONES
       'scrollUp', 'scrollDown',
       // Touch events
       'touchstart', 'touchmove', 'touchend', 'touchcancel',
@@ -89,8 +89,6 @@ function App() {
       'keydown', 'keyup', 'keypress',
       // Gesture events (WebKit)
       'gesturestart', 'gesturechange', 'gestureend',
-      // Scroll event
-      'scroll',
       // Custom potential R1 events
       'r1scroll', 'r1wheel', 'r1input', 'rabbitscroll',
       'scrollwheel', 'scroll-wheel', 'wheelscroll',
@@ -104,6 +102,14 @@ function App() {
       const handler = (e) => {
         let details = `type=${e.type}`;
         
+        // Add target information
+        let targetInfo = 'unknown';
+        if (e.target === window) targetInfo = 'window';
+        else if (e.target === document) targetInfo = 'document';
+        else if (e.target === scrollTestRef.current) targetInfo = 'container';
+        else if (e.target?.nodeName) targetInfo = e.target.nodeName;
+        details += `, target=${targetInfo}`;
+        
         // Add relevant details based on event type
         if (e.deltaY !== undefined) details += `, deltaY=${e.deltaY}`;
         if (e.deltaX !== undefined) details += `, deltaX=${e.deltaX}`;
@@ -112,25 +118,24 @@ function App() {
         if (e.key) details += `, key=${e.key}`;
         if (e.touches) details += `, touches=${e.touches.length}`;
         
-        addLog(`EVENT: ${details}`);
+        // Only log non-container scroll events to reduce noise
+        if (e.type !== 'scroll' || e.target !== scrollTestRef.current) {
+          addLog(`EVENT: ${details}`);
+        }
         
         // Handle scrolling based on event type
         if (scrollTestRef.current) {
           let scrollAmount = 0;
           
-          // R1 custom events: "scroll" = DOWN, "scrollUp" = UP
-          if (e.type === 'scrollUp') {
-            scrollAmount = -40; // ScrollUp = move content UP (decrease scrollTop)
-            addLog(`→ scrollUp: -40 (target: ${e.target.nodeName || e.target})`);
-          } else if (e.type === 'scroll') {
-            // Check if this is from the R1 wheel (not from our container scrolling)
-            const isFromContainer = e.target === scrollTestRef.current;
-            if (!isFromContainer) {
-              scrollAmount = 40; // scroll = move content DOWN (increase scrollTop)
-              addLog(`→ scroll: +40 (target: ${e.target.nodeName || e.target})`);
-            } else {
-              addLog(`→ scroll: ignored (from container)`);
-            }
+          // R1 custom events: directions are flipped!
+          // "scrollUp" = wheel turns up = moves content DOWN (increase scrollTop)
+          // "scrollDown" = wheel turns down = moves content UP (decrease scrollTop)
+          if (e.type === 'scrollDown') {
+            scrollAmount = -40; // scrollDown event = moves content UP
+            addLog(`→ SCROLLDOWN: applying -40`);
+          } else if (e.type === 'scrollUp') {
+            scrollAmount = 40; // scrollUp event = moves content DOWN
+            addLog(`→ SCROLLUP: applying +40`);
           }
           // Standard wheel events (for web testing)
           else if (e.deltaY !== undefined && e.type === 'wheel') {
@@ -195,7 +200,7 @@ function App() {
     <div className="viewport">
       <div className="App">
         <header className="debug-header">
-          <h1>R1 Scroll Debug <span className="version">v2.3</span></h1>
+          <h1>R1 Scroll Debug <span className="version">v2.8</span></h1>
           <div className="debug-info">
             Scroll: {scrollPosition}px | Events: {logs.length}
           </div>
