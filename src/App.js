@@ -5,10 +5,7 @@ function App() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentView, setCurrentView] = useState('list'); // 'list' or 'article'
-  const [currentArticle, setCurrentArticle] = useState(null);
   const articlesContainerRef = useRef(null);
-  const iframeRef = useRef(null);
 
   useEffect(() => {
     const fetchRSSFeed = async () => {
@@ -42,38 +39,15 @@ function App() {
     fetchRSSFeed();
   }, []);
 
-  // Function to open an article
-  const openArticle = (article) => {
-    setCurrentArticle(article);
-    setCurrentView('article');
-  };
-
-  // Function to go back to article list
-  const goBackToList = () => {
-    setCurrentView('list');
-    setCurrentArticle(null);
-  };
-
   // Scroll wheel and keyboard functionality for Rabbit R1 device
   useEffect(() => {
     const scrollContainer = (amount) => {
-      if (currentView === 'list' && articlesContainerRef.current) {
+      if (articlesContainerRef.current) {
         const container = articlesContainerRef.current;
         container.scrollBy({
           top: amount,
           behavior: 'smooth'
         });
-      } else if (currentView === 'article' && iframeRef.current) {
-        // For iframe, try to scroll the iframe's content
-        try {
-          iframeRef.current.contentWindow.scrollBy({
-            top: amount,
-            behavior: 'smooth'
-          });
-        } catch (e) {
-          // If cross-origin, we can't access iframe content
-          console.log('Cannot scroll iframe due to cross-origin restrictions');
-        }
       }
     };
 
@@ -123,12 +97,12 @@ function App() {
       document.removeEventListener('scrollUp', handleScrollUp, { capture: true });
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [currentView, articles]); // Re-run when view or articles change
+  }, [articles]); // Re-run when articles are loaded
 
   if (loading) {
-    return (
-      <div className="viewport">
-        <div className="App">
+  return (
+    <div className="viewport">
+      <div className="App">
           <div className="loading">loading nyt stories...</div>
         </div>
       </div>
@@ -145,29 +119,6 @@ function App() {
     );
   }
 
-  // Article view
-  if (currentView === 'article' && currentArticle) {
-    return (
-      <div className="viewport">
-        <div className="App">
-          <header className="article-header">
-            <h1>The New York Times</h1>
-            <button className="back-button" onClick={goBackToList}>← Back</button>
-          </header>
-          <div className="article-iframe-container">
-            <iframe
-              ref={iframeRef}
-              src={currentArticle.link}
-              title={currentArticle.title}
-              className="article-iframe"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Article list view
   return (
     <div className="viewport">
       <div className="App">
@@ -180,14 +131,7 @@ function App() {
         <main className="articles-container" ref={articlesContainerRef}>
           {articles.map((article, index) => (
             <article key={index} className="article-card">
-              <h2 className="article-title">
-                <button 
-                  className="article-link" 
-                  onClick={() => openArticle(article)}
-                >
-                  {article.title}
-                </button>
-              </h2>
+              <h2 className="article-title">{article.title}</h2>
               {article.category && (
                 <span className="article-category">{article.category}</span>
               )}
