@@ -56,6 +56,11 @@ body {
   color: #0ff;
 }
 
+.debug-header h1 .version {
+  color: #f0f;
+  font-size: 10px;
+}
+
 .debug-info {
   font-size: 8px;
   color: #0f0;

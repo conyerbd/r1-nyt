@@ -187,7 +187,7 @@ function App() {
     <div className="viewport">
       <div className="App">
         <header className="debug-header">
-          <h1>R1 Scroll Debug v2</h1>
+          <h1>R1 Scroll Debug <span className="version">v2.1</span></h1>
           <div className="debug-info">
             Scroll: {scrollPosition}px | Events: {logs.length}
           </div>
