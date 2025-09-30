@@ -181,9 +181,18 @@ function App() {
   return (
     <div className="viewport">
       <div className="App">
-          <div className="loading">loading nyt stories...</div>
+        <div className="version">v1.0</div>
+        <header className="app-header">
+          <h1>The New York Times</h1>
+          <p className="last-updated">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </header>
+        <div className="loading-container">
+          <div className="spinner"></div>
         </div>
       </div>
+    </div>
     );
   }
 
@@ -200,7 +209,7 @@ function App() {
   return (
     <div className="viewport">
       <div className="App">
-        <div className="version">v1.0</div>
+        <div className="version">v1.1</div>
         <header className="app-header">
           <h1>The New York Times</h1>
           <p className="last-updated">
