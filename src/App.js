@@ -118,7 +118,10 @@ function App() {
         if (e.key) details += `, key=${e.key}`;
         if (e.touches) details += `, touches=${e.touches.length}`;
         
-        addLog(`EVENT: ${details}`);
+        // Only log non-container scroll events to reduce noise
+        if (e.type !== 'scroll' || e.target !== scrollTestRef.current) {
+          addLog(`EVENT: ${details}`);
+        }
         
         // Handle scrolling based on event type
         if (scrollTestRef.current) {
@@ -127,21 +130,16 @@ function App() {
           // R1 custom events: "scroll" = wheel DOWN, "scrollDown" = wheel UP (yes, it's backwards!)
           if (e.type === 'scrollDown') {
             scrollAmount = -40; // scrollDown event = moves content UP
-            addLog(`→ SCROLLDOWN EVENT DETECTED: will apply -40`);
+            addLog(`→ SCROLLDOWN: applying -40`);
           } else if (e.type === 'scroll') {
             // Check if this is from the R1 wheel (not from our container scrolling)
             const isFromContainer = e.target === scrollTestRef.current;
-            const targetName = e.target === window ? 'window' : 
-                              e.target === document ? 'document' : 
-                              e.target === scrollTestRef.current ? 'container' : 
-                              (e.target?.nodeName || 'unknown');
-            addLog(`→ SCROLL EVENT: target=${targetName}, isFromContainer=${isFromContainer}`);
+            
             if (!isFromContainer) {
               scrollAmount = 40; // scroll event = moves content DOWN
-              addLog(`→ SCROLL: will apply +40`);
-            } else {
-              addLog(`→ SCROLL: ignored (container feedback)`);
+              addLog(`→ SCROLL from R1: applying +40`);
             }
+            // Don't log ignored container scrolls - too much noise
           }
           // Standard wheel events (for web testing)
           else if (e.deltaY !== undefined && e.type === 'wheel') {
@@ -206,7 +204,7 @@ function App() {
     <div className="viewport">
       <div className="App">
         <header className="debug-header">
-          <h1>R1 Scroll Debug <span className="version">v2.7</span></h1>
+          <h1>R1 Scroll Debug <span className="version">v2.8</span></h1>
           <div className="debug-info">
             Scroll: {scrollPosition}px | Events: {logs.length}
           </div>
